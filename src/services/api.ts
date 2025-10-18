@@ -170,20 +170,32 @@ export const blogAPI = {
     return api.delete<ApiResponse<void>>(`/posts/${id}?userEmail=${userEmail}`);
   },
 
-  likePost: (id: string) => {
-    const userEmail = localStorage.getItem('userEmail');
-    return api.post<ApiResponse<Post>>(`/posts/${id}/like?userEmail=${userEmail}`);
-  },
+  likePost: (id: string) => api.post<ApiResponse<Post>>(`/posts/${id}/like`),
+  dislikePost: (id: string) => api.post<ApiResponse<Post>>(`/posts/${id}/unlike`),
 
   sharePost: (id: string) => {
     const userEmail = localStorage.getItem('userEmail');
     return api.post<ApiResponse<Post>>(`/posts/${id}/share?userEmail=${userEmail}`);
   },
 
-  addComment: (id: string, content: string) => {
-    const userEmail = localStorage.getItem('userEmail');
-    return api.post<ApiResponse<Comment>>(`/posts/${id}/comment`, { content, userEmail });
-  }
+ // Add a comment to a post
+addComment: async (id: string, content: string) => {
+  const userEmail = localStorage.getItem('userEmail');
+  if (!userEmail) throw new Error('User not logged in');
+
+  const res = await api.post<ApiResponse<Comment>>(
+    `/posts/${id}/comment`,
+    { content, userEmail } // backend expects this
+  );
+
+  return res.data.data; // return the created comment
+},
+
+// Get all comments for a post
+getComments: async (postId: string) => {
+  const res = await api.get<ApiResponse<Comment[]>>(`/posts/${postId}/comments`);
+  return res.data.data;
+}
 };
 
 export default api;
