@@ -87,7 +87,9 @@ const Home: React.FC = () => {
               </IconButton>
               <IconButton size="small" onClick={() => navigate(`/post/${post.id}`)} color="primary">
                 <CommentIcon />
-                <Typography variant="caption" sx={{ ml: 0.5 }}>{post.comments.length}</Typography>
+                  <Typography variant="caption" sx={{ ml: 0.5 }}>
+                    {post.comments?.length ?? 0}
+                  </Typography>
               </IconButton>
               <Button size="small" onClick={() => navigate(`/post/${post.id}`)} sx={{ ml: 'auto' }}>
                 Read More
