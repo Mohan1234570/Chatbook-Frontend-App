@@ -1,4 +1,3 @@
-
 import axios from 'axios';
 import { Post, Comment, ApiResponse } from '../types/index';
 
@@ -111,13 +110,49 @@ export const authAPI = {
 
 // ✅ Blog APIs
 
-// Normalize createdAt so it’s always a string
+// Update normalizeCreatedAt helper (if you already have it) or add below:
+
+const normalizeCreatedAtValue = (val: any): string => {
+  if (!val) return new Date().toISOString();
+  if (typeof val === 'string') return val;
+  if (val instanceof Date) return val.toISOString();
+  if (typeof val === 'object') {
+    return val.dateCreated ?? val.createdAt ?? new Date().toISOString();
+  }
+  return String(val);
+};
+
 const normalizePost = (post: any): Post => ({
   ...post,
-  createdAt:
-    typeof post.createdAt === 'string'
-      ? post.createdAt
-      : post.createdAt?.dateCreated || new Date().toISOString(),
+  // ensure createdAt is a string
+  createdAt: normalizeCreatedAtValue(post.createdAt ?? post.dateCreated ?? post.dateCreated),
+
+  // primary number of likes (use likesCount, or fallback to array length)
+  likes: post.likesCount ?? (Array.isArray(post.likes) ? post.likes.length : post.likes ?? 0),
+
+  // preserve the raw likes array as normalized date strings
+  likesDetails: Array.isArray(post.likes)
+    ? post.likes.map((l: any) => ({
+        id: String(l.id ?? l._id ?? ''),
+
+        dateCreated: normalizeCreatedAtValue(l.dateCreated ?? l.createdAt ?? l.createdOn),
+      }))
+    : undefined,
+
+  // preserve the list of users who liked (if backend provides it)
+  likedBy: Array.isArray(post.likedBy) ? post.likedBy : undefined,
+
+  // normalize comments (if not already handled)
+  comments: Array.isArray(post.comments)
+    ? post.comments.map((c: any) => ({
+        id: String(c.id ?? c._id ?? ''),
+
+        content: c.content ?? '',
+        username: c.username ?? c.userEmail ?? c.name ?? 'Anonymous',
+        // accept createdOn, createdAt, dateCreated (most backends use one of these)
+        createdAt: normalizeCreatedAtValue(c.createdAt ?? c.dateCreated ?? c.createdOn),
+      }))
+    : [],
 });
 
 export const blogAPI = {
@@ -194,7 +229,17 @@ addComment: async (id: string, content: string) => {
 // Get all comments for a post
 getComments: async (postId: string) => {
   const res = await api.get<ApiResponse<Comment[]>>(`/posts/${postId}/comments`);
-  return res.data.data;
+  const raw = res.data.data;
+  // normalize each comment's createdAt
+  return Array.isArray(raw)
+    ? raw.map((c: any) => ({
+        id: String(c.id ?? c._id ?? ''),
+
+        content: c.content ?? '',
+        username: c.username ?? c.userEmail ?? c.name ?? 'Anonymous',
+        createdAt: normalizeCreatedAtValue(c.createdAt ?? c.dateCreated ?? c.createdOn),
+      }))
+    : [];
 }
 };
 

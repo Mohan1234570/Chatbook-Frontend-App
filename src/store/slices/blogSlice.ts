@@ -24,6 +24,10 @@ export interface Post {
   likes: number;
   shares: number;
   comments: Comment[];
+  commentsCount?: number;
+
+  likesDetails?: { id: string; dateCreated: string }[];
+  likedBy?: string[];
 }
 
 interface BlogState {
@@ -43,11 +47,18 @@ const blogSlice = createSlice({
   initialState,
   reducers: {
     addPost: (state, action: PayloadAction<Post>) => {
-      state.posts.unshift(action.payload);
+      // Ensure commentsCount is set
+      const p = { ...action.payload };
+      p.comments = Array.isArray(p.comments) ? p.comments : [];
+      p.commentsCount = typeof p.commentsCount === 'number' ? p.commentsCount : p.comments.length;
+      state.posts.unshift(p);
       state.totalPosts += 1;
     },
     setCurrentPost: (state, action: PayloadAction<Post>) => {
-      state.currentPost = action.payload;
+      const p = { ...action.payload };
+      p.comments = Array.isArray(p.comments) ? p.comments : [];
+      p.commentsCount = typeof p.commentsCount === 'number' ? p.commentsCount : p.comments.length;
+      state.currentPost = p;
     },
     updateLikes: (state, action: PayloadAction<{ postId: string; likes: number }>) => {
       const post = state.posts.find(p => p.id === action.payload.postId);
@@ -61,26 +72,51 @@ const blogSlice = createSlice({
         post.shares = action.payload.shares;
       }
     },
-    // FIXED: use Comment interface instead of CommentType
+    // Update comments array AND keep commentsCount in sync
     addComment: (state, action: PayloadAction<{ postId: string; allComments: Comment[] }>) => {
       const { postId, allComments } = action.payload;
       const post = state.posts.find(p => p.id === postId);
       if (post) {
-        post.comments = allComments; // replace with latest from API
+        post.comments = Array.isArray(allComments) ? allComments : [];
+        post.commentsCount = post.comments.length;
+      }
+      // also update currentPost if it matches
+      if (state.currentPost && state.currentPost.id === postId) {
+        state.currentPost.comments = Array.isArray(allComments) ? allComments : [];
+        state.currentPost.commentsCount = state.currentPost.comments.length;
       }
     },
     deletePost: (state, action: PayloadAction<string>) => {
       state.posts = state.posts.filter(p => p.id !== action.payload);
       state.totalPosts -= 1;
+      if (state.currentPost?.id === action.payload) {
+        state.currentPost = null;
+      }
     },
     setPosts: (state, action: PayloadAction<Post[]>) => {
-      state.posts = action.payload;
-      state.totalPosts = action.payload.length;
+      // Ensure each post has comments array and commentsCount set
+      state.posts = action.payload.map(p => {
+        const postCopy = { ...p };
+        postCopy.comments = Array.isArray(postCopy.comments) ? postCopy.comments : [];
+        postCopy.commentsCount =
+          typeof postCopy.commentsCount === 'number' ? postCopy.commentsCount : postCopy.comments.length;
+        return postCopy;
+      });
+      state.totalPosts = state.posts.length;
     },
     updatePost: (state, action: PayloadAction<Post>) => {
-      const index = state.posts.findIndex(p => p.id === action.payload.id);
+      const newPost = { ...action.payload };
+      newPost.comments = Array.isArray(newPost.comments) ? newPost.comments : [];
+      newPost.commentsCount =
+        typeof newPost.commentsCount === 'number' ? newPost.commentsCount : newPost.comments.length;
+
+      const index = state.posts.findIndex(p => p.id === newPost.id);
       if (index !== -1) {
-        state.posts[index] = action.payload;
+        state.posts[index] = newPost;
+      }
+
+      if (state.currentPost?.id === newPost.id) {
+        state.currentPost = newPost;
       }
     },
   },
