@@ -111,7 +111,7 @@ import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store/store';
 import { blogAPI } from '../services/api';
-import { Post } from '../types';
+import { Post } from '../types/index';
 import { normalizeCreatedAt } from '../utils/normalize';
 import {
   Container,

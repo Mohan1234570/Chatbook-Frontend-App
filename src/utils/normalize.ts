@@ -1,8 +1,8 @@
-import { CreatedAtObject } from '../types';
+import { CreatedAtObject } from "types";
 
-export const normalizeCreatedAt = (createdAt: string | CreatedAtObject | undefined): string => {
-  if (!createdAt) return 'Unknown date';
-  return typeof createdAt === 'string'
-    ? createdAt
-    : createdAt.dateCreated || 'Unknown date';
-};
+export function normalizeCreatedAt(value?: string | Date | null): string {
+  if (!value) return new Date().toISOString();
+  if (value instanceof Date) return value.toISOString();
+  const parsed = new Date(value);
+  return Number.isNaN(parsed.getTime()) ? String(value) : parsed.toISOString();
+}

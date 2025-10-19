@@ -4,6 +4,7 @@ export interface Comment {
   content: string;
   username: string;
   createdAt: string;
+  _id?: string; // <-- added optional _id for backend compatibility
 }
 
 // Define user structure
@@ -13,6 +14,16 @@ export interface User {
   firstname: string | null;
   lastname: string | null;
 }
+
+export interface AdminUser {
+  id: string;
+  username: string;
+  email: string;
+  role: 'user' | 'admin';
+ followers?: AdminUser[]; // array of users following this admin
+  following?: AdminUser[]; // array of users this user is following
+}
+
 
 // Define possible structure for createdAt object
 // export interface CreatedAtObject {
@@ -25,7 +36,6 @@ export interface CreatedAtObject {
 
 // Define Post structure with createdAt possibly being an object
 export interface Post {
-  data: any;
   id: string;
   title: string;
   content: string;

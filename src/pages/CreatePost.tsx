@@ -274,8 +274,7 @@ import { RootState } from '../store/store';
 import { addPost } from '../store/slices/blogSlice';
 import { Post } from '../store/slices/blogSlice';
 import { blogAPI } from 'services/api';
-import { CreatedAtObject } from '../types';
-
+import { normalizeCreatedAt } from '../utils/normalize';
 
 const CreatePost: React.FC = () => {
   const navigate = useNavigate();
@@ -333,19 +332,22 @@ const CreatePost: React.FC = () => {
         image: formData.image || undefined,
       });
 
-      const normalizeCreatedAt = (createdAt: string | CreatedAtObject): string =>
-      typeof createdAt === 'string' ? createdAt : createdAt.dateCreated;
-
-
       if (response.data) {
         const postData = response.data;
 
-        // ✅ Normalize createdAt to a string
-        // const createdAtString =
-        //   typeof postData.createdAt === 'string'
-        //     ? postData.createdAt
-        //     : postData.createdAt?.dateCreated || new Date().toISOString();
+        const rawCreatedAt = postData.createdAt; // could be string | { dateCreated: string } | Date | undefined
 
+        // Narrow/unwrap safely into a value normalizeCreatedAt accepts (string | Date | undefined)
+        let createdAtValue: string | Date | undefined;
+        if (rawCreatedAt && typeof rawCreatedAt === 'object') {
+          // backend may return { dateCreated: '...' } or { createdAt: '...' }
+          const obj = rawCreatedAt as any;
+          createdAtValue = obj.dateCreated ?? obj.createdAt;
+        } else {
+          createdAtValue = rawCreatedAt as string | Date | undefined;
+        }
+
+        // then build newPost using normalizeCreatedAt(createdAtValue)
         const newPost: Post = {
           id: String(postData.id || ''),
           title: String(postData.title || ''),
@@ -357,7 +359,7 @@ const CreatePost: React.FC = () => {
             firstname: postData.user?.firstname || null,
             lastname: postData.user?.lastname || null,
           },
-          createdAt: normalizeCreatedAt(response.data.data.createdAt),
+          createdAt: normalizeCreatedAt(createdAtValue),
           likes: 0,
           shares: 0,
           comments: Array.isArray(postData.comments) ? postData.comments : [],
