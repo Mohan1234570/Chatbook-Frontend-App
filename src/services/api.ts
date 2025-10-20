@@ -92,7 +92,7 @@ export const authAPI = {
     }
   },
 
-  register: async (userData: { name: string; email: string; password: string; phone: string }) => {
+  register: async (userData: { firstname: string; lastname: string, email: string; password: string; phone: string }) => {
     try {
       const response = await api.post('/users/register', userData);
       return response;

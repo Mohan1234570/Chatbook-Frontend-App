@@ -86,16 +86,26 @@ const Login: React.FC = () => {
   localStorage.setItem('user', JSON.stringify(user));
   console.log('Token and user stored in localStorage');
 
-  // ✅ Update Redux state with user data
-  dispatch(loginSuccess({
-    token: token,
-    user: {
-      id: user.id || '',
-      email: user.email || formData.email,
-      username: user.name || '',
-      role: 'user'
-    }
-  }));
+  /// Safely split full name from backend if it only returns 'name'
+const fullName = (user as any).name || '';
+const [firstname, ...rest] = fullName.split(' ');
+const lastname = rest.join(' ');
+
+  dispatch(
+    loginSuccess({
+      token: token,
+      user: {
+        id: user.id || '',
+        firstname,
+        lastname,
+        email: user.email || formData.email,
+        role: user.role === 'admin' ? 'admin' : 'user',
+        profileImageUrl: (user as any).profileImageUrl || '',
+        bio: (user as any).bio || '',
+      },
+    })
+  );
+
   console.log('Redux state updated');
 
   // ✅ Redirect to home page

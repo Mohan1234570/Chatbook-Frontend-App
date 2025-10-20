@@ -4,6 +4,7 @@ export interface Comment {
   content: string;
   username: string;
   createdAt: string;
+   userId: string;
   _id?: string; // <-- added optional _id for backend compatibility
 }
 
@@ -14,6 +15,8 @@ export interface User {
   firstname: string | null;
   lastname: string | null;
 }
+
+
 
 export interface AdminUser {
   id: string;
