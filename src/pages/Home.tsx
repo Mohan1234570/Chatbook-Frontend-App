@@ -238,7 +238,6 @@
 
 
 
-
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
@@ -252,6 +251,37 @@ import {
   Button, IconButton, Chip, Dialog, DialogContent, DialogTitle, TextField
 } from '@mui/material';
 import { ThumbUp as ThumbUpIcon, ThumbDown as ThumbDownIcon, Share as ShareIcon, Comment as CommentIcon } from '@mui/icons-material';
+
+// Types
+interface User {
+  userId: number;
+  firstname?: string | null;
+  lastname?: string | null;
+  emailid: string;
+  profileImageUrl?: string | null;
+  bio?: string | null;
+}
+
+interface Comment {
+  id: string;
+  content: string;
+  username: string;
+  userId?: number; // used for navigation
+  createdAt: string;
+}
+
+interface Post {
+  id: string;
+  title: string;
+  content: string;
+  imageUrl?: string;
+  user?: User;
+  dateCreated: string;
+  likes: number;
+  shares: number;
+  comments: Comment[];
+  commentsCount?: number;
+}
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
@@ -268,13 +298,12 @@ const Home: React.FC = () => {
 
   const loadAllPosts = async () => {
     try {
-      let allPosts = await fetchAllPosts();
+      let allPosts: Post[] = await fetchAllPosts();
       allPosts = allPosts.map(post => {
-        const createdAt = normalizeCreatedAt(post.dateCreated);
-        const commentsArray = Array.isArray(post.comments) ? post.comments : [];
-        const commentsCount = typeof (post as any).commentsCount === 'number' ? (post as any).commentsCount : commentsArray.length;
-
-        return { ...post, dateCreated: createdAt, comments: commentsArray, commentsCount };
+        const dateCreated = normalizeCreatedAt(post.dateCreated);
+        const commentsArray: Comment[] = Array.isArray(post.comments) ? post.comments : [];
+        const commentsCount = typeof post.commentsCount === 'number' ? post.commentsCount : commentsArray.length;
+        return { ...post, dateCreated, comments: commentsArray, commentsCount };
       });
       dispatch(setPosts(allPosts));
     } catch (err) {
@@ -298,26 +327,34 @@ const Home: React.FC = () => {
     try { await blogAPI.sharePost(postId); await loadAllPosts(); } catch (err) { console.error(err); }
   };
 
-  // Comment
+  // Comment handling
   const handleOpenComment = (postId: string) => { if (!isAuthenticated) return navigate('/login'); setOpenCommentId(postId); setCommentText(''); };
   const handleCloseComment = () => { setOpenCommentId(null); setCommentText(''); };
 
   const handleSubmitComment = async (postId: string, commentText: string) => {
     if (!isAuthenticated) return navigate('/login');
     try {
+      // Add comment
       await blogAPI.addComment(postId, commentText);
+
+      // Fetch latest comments
       const latestComments = await blogAPI.getComments(postId);
-      const normalizedComments = latestComments.map(c => ({
+
+      // Normalize comments to include userId for navigation
+      const normalizedComments: Comment[] = latestComments.map(c => ({
         id: c.id,
         content: c.content,
-        username: c.username ?? (c as any).userEmail,
-        userId: c.username?.id ?? (c as any).userId, // ensure userId exists
+        username: c.user?.firstname || c.user?.emailid || 'Unknown',
+        userId: c.user?.userId,
         createdAt: c.createdAt
       }));
+
       dispatch(addComment({ postId, allComments: normalizedComments }));
 
+      // Refresh selected post
       const refreshedPost = await blogAPI.getPost(postId);
       dispatch(setCurrentPost(refreshedPost));
+
       setCommentText('');
     } catch (err) { console.error(err); }
   };
@@ -334,15 +371,15 @@ const Home: React.FC = () => {
             {post.imageUrl && (
               <Box sx={{ height: { xs: 140, sm: 160, md: 200 }, overflow: 'hidden' }}>
                 <img
-                  src={typeof post.imageUrl === 'string' && post.imageUrl.startsWith('http') ? post.imageUrl : `http://localhost:8080${post.imageUrl}`}
+                  src={post.imageUrl.startsWith('http') ? post.imageUrl : `http://localhost:8080${post.imageUrl}`}
                   alt={post.title}
-                  style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                 />
               </Box>
             )}
 
             <CardContent sx={{ flexGrow: 1 }}>
-              <Typography variant="h6" component="h3" gutterBottom>{post.title}</Typography>
+              <Typography variant="h6" gutterBottom>{post.title}</Typography>
               <Typography variant="body2" color="text.secondary" sx={{ overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 6, WebkitBoxOrient: 'vertical' }}>
                 {post.content}
               </Typography>
@@ -363,23 +400,23 @@ const Home: React.FC = () => {
 
             <CardActions sx={{ mt: 'auto', px: 2, pb: 2 }}>
               <IconButton size="small" onClick={() => handleLike(post.id)} color="primary"><ThumbUpIcon /></IconButton>
-              <Typography variant="body2" sx={{ mr: 2 }}>{post.likes}</Typography>
+              <Typography variant="body2" sx={{ mr: 2 }}>{post.likes ?? 0}</Typography>
 
               <IconButton size="small" onClick={() => handleDislike(post.id)} color="secondary"><ThumbDownIcon /></IconButton>
 
               <IconButton size="small" onClick={() => handleShare(post.id)} color="primary"><ShareIcon /></IconButton>
-              <Typography variant="body2" sx={{ mr: 'auto' }}>{post.shares}</Typography>
+              <Typography variant="body2" sx={{ mr: 'auto' }}>{post.shares ?? 0}</Typography>
 
               <IconButton size="small" onClick={() => handleOpenComment(String(post.id))} color="primary"><CommentIcon /></IconButton>
               <Typography variant="body2">{post.commentsCount ?? post.comments?.length ?? 0}</Typography>
 
-              <Button size="small" onClick={() => handleOpenPost(post.id)} sx={{ ml: 1 }}>Read More</Button>
+              <Button size="small" onClick={() => handleOpenPost(post.id)}>Read More</Button>
             </CardActions>
           </Card>
         ))}
       </Box>
 
-      {/* Post Details Dialog */}
+      {/* Post Dialog */}
       <Dialog open={!!selectedPost} onClose={handleClosePost} maxWidth="md" fullWidth>
         {selectedPost && (
           <>
@@ -392,7 +429,6 @@ const Home: React.FC = () => {
                   variant="outlined"
                   clickable
                   onClick={() => selectedPost.user?.userId && navigate(`/profile/${selectedPost.user.userId}`)}
-                  sx={{ mr: 1 }}
                 />
                 <Typography variant="caption" color="text.secondary" sx={{ ml: 1 }}>
                   {new Date(selectedPost.createdAt).toLocaleDateString()}
@@ -424,10 +460,7 @@ const Home: React.FC = () => {
               <Typography variant="subtitle2" color="text.secondary">Commenting on: {commentPost.title}</Typography>
 
               <TextField
-                multiline
-                rows={4}
-                fullWidth
-                sx={{ mt: 2 }}
+                multiline rows={4} fullWidth sx={{ mt: 2 }}
                 placeholder="Write your comment here..."
                 value={commentText}
                 onChange={e => setCommentText(e.target.value)}
@@ -450,7 +483,7 @@ const Home: React.FC = () => {
                         size="small"
                         variant="outlined"
                         clickable
-                        onClick={() => c.username && navigate(`/profile/${c.username}`)}
+                        onClick={() => c.userId && navigate(`/profile/${c.userId}`)}
                         sx={{ mr: 1 }}
                       />
                       • {new Date(c.createdAt).toLocaleString()}
