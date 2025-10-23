@@ -46,7 +46,7 @@ const Register: React.FC = () => {
   const [showSuccess, setShowSuccess] = useState(false);
   const [validationErrors, setValidationErrors] = useState<{ [key: string]: string }>({});
 
-  // ✅ Validation
+  // Validation
   const validateForm = () => {
     const errors: { [key: string]: string } = {};
 
