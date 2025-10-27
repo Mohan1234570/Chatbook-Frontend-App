@@ -5,20 +5,18 @@ import { ThemeProvider, CssBaseline, Box } from '@mui/material';
 import { store } from './store/store';
 import theme from './theme';
 
-// Components
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import PrivateRoute from './components/PrivateRoute';
+import AuthInitializer from './components/AuthInitializer';
 
-// Pages
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import CreatePost from './pages/CreatePost';
 import PostDetail from './pages/PostDetail';
 import Profile from './pages/Profile';
-import MyPosts from 'pages/MyPosts';
-import AuthInitializer from 'components/AuthInitializer';
+import MyPosts from './pages/MyPosts';
 
 function App() {
   return (
