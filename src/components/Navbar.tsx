@@ -23,7 +23,6 @@ import {
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import { RootState } from '../store/store';
 
-// Small notification item type (local). If you have a notification type in your store, use that instead.
 type NotificationItem = {
   id: string;
   title: string;
