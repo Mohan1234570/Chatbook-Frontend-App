@@ -5,6 +5,7 @@ export interface Comment {
   content: string;
   username: string;
   createdAt: string;
+  userId?: number;
   _id?: string; // <-- allow optional Mongo-style id sent by backend
 }
 
