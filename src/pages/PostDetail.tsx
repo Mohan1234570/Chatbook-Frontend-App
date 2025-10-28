@@ -32,7 +32,6 @@ const PostDetail: React.FC = () => {
   const [commentText, setCommentText] = useState('');
   const [error, setError] = useState('');
 
-  // New: full image modal state
   const [openImage, setOpenImage] = useState<string | null>(null);
 
   // Helper: always return a string ISO date for any createdAt shape
