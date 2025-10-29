@@ -34,7 +34,6 @@ const PostDetail: React.FC = () => {
 
   const [openImage, setOpenImage] = useState<string | null>(null);
 
-  // Helper: always return a string ISO date for any createdAt shape
   const normalizeDate = (val: any): string => {
     if (!val) return new Date().toISOString();
     if (typeof val === 'string') return val;
