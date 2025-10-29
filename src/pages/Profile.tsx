@@ -294,7 +294,7 @@ const Profile: React.FC = () => {
                           alt={post.title}
                           loading="lazy"
                           style={{
-                            width: '100%', // fill available width
+                            width: '100%', 
                             height: 'auto', // preserve aspect ratio — no cropping
                             objectFit: 'contain',
                             display: 'block',
