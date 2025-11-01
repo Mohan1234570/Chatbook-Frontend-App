@@ -16,6 +16,7 @@ import PostDetail from './pages/PostDetail';
 import Profile from './pages/Profile';
 import MyPosts from './pages/MyPosts';
 import LandingPage from './pages/LandingPage';
+import PublicRoute from 'components/PublicRoute';
 
 function App() {
   // 🌙 Dark Mode Toggle
@@ -62,9 +63,23 @@ function App() {
                 {/* Default route → Landing Page */}
                 <Route path="/" element={<LandingPage />} />
 
-                {/* Auth pages */}
-                <Route path="/login" element={<Login />} />
-                <Route path="/register" element={<Register />} />
+                {/* Public routes */}
+                <Route
+                  path="/login"
+                  element={
+                    <PublicRoute>
+                      <Login />
+                    </PublicRoute>
+                  }
+                />
+                <Route
+                  path="/register"
+                  element={
+                    <PublicRoute>
+                      <Register />
+                    </PublicRoute>
+                  }
+                />
 
                 {/* Home */}
                 <Route path="/home" element={<Home />} />
