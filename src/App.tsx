@@ -1,13 +1,15 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { Provider, useSelector } from 'react-redux';
+import { Provider } from 'react-redux';
 import { ThemeProvider, CssBaseline, Box, createTheme } from '@mui/material';
 import { store } from './store/store';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import PrivateRoute from './components/PrivateRoute';
+import PublicRoute from './components/PublicRoute';
 import AuthInitializer from './components/AuthInitializer';
 
+// Pages
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -16,13 +18,15 @@ import PostDetail from './pages/PostDetail';
 import Profile from './pages/Profile';
 import MyPosts from './pages/MyPosts';
 import LandingPage from './pages/LandingPage';
-import PublicRoute from 'components/PublicRoute';
 
 function App() {
-  // 🌙 Dark Mode Toggle
-  const [darkMode, setDarkMode] = useState(false);
+  // 🌙 Load dark mode preference from localStorage (persistent)
+  const [darkMode, setDarkMode] = useState<boolean>(() => {
+    const storedMode = localStorage.getItem('darkMode');
+    return storedMode ? storedMode === 'true' : false;
+  });
 
-  // 🎨 Dynamically create MUI theme
+  // 🎨 Create theme dynamically
   const appliedTheme = useMemo(
     () =>
       createTheme({
@@ -33,14 +37,20 @@ function App() {
           },
           background: {
             default: darkMode ? '#121212' : '#f5f5f5',
-            paper: darkMode ? '#1e1e1e' : '#fff',
+            paper: darkMode ? '#1e1e1e' : '#ffffff',
           },
         },
       }),
     [darkMode]
   );
 
-  const toggleTheme = () => setDarkMode(!darkMode);
+  // 💾 Persist theme mode in localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('darkMode', String(darkMode));
+  }, [darkMode]);
+
+  // 🌓 Toggle dark/light theme
+  const toggleTheme = () => setDarkMode((prev) => !prev);
 
   return (
     <Provider store={store}>
@@ -52,13 +62,17 @@ function App() {
               display: 'flex',
               flexDirection: 'column',
               minHeight: '100vh',
+              bgcolor: 'background.default',
+              color: 'text.primary',
+              transition: 'background-color 0.3s ease, color 0.3s ease',
             }}
           >
             <AuthInitializer />
-            {/* ✅ Pass theme toggle to Navbar */}
+            {/* ✅ Navbar with theme toggle */}
             <Navbar toggleTheme={toggleTheme} darkMode={darkMode} />
 
-            <Box sx={{ flex: 1 }}>
+            {/* ✅ Main content */}
+            <Box sx={{ flex: 1, mt: 2 }}>
               <Routes>
                 {/* Default route → Landing Page */}
                 <Route path="/" element={<LandingPage />} />
@@ -81,10 +95,15 @@ function App() {
                   }
                 />
 
-                {/* Home */}
-                <Route path="/home" element={<Home />} />
-
-                {/* Private Routes */}
+                {/* Authenticated routes */}
+                <Route
+                  path="/home"
+                  element={
+                    <PrivateRoute>
+                      <Home />
+                    </PrivateRoute>
+                  }
+                />
                 <Route
                   path="/create-post"
                   element={
@@ -111,11 +130,12 @@ function App() {
                   }
                 />
 
-                {/* Fallback → 404 or redirect */}
+                {/* Fallback */}
                 <Route path="*" element={<Navigate to="/" />} />
               </Routes>
             </Box>
 
+            {/* ✅ Footer remains consistent */}
             <Footer />
           </Box>
         </Router>
@@ -123,6 +143,5 @@ function App() {
     </Provider>
   );
 }
-
 
 export default App;

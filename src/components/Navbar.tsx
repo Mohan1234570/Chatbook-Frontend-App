@@ -131,10 +131,13 @@ const Navbar: React.FC<{ toggleTheme?: () => void; darkMode?: boolean }> = ({
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    dispatch(logout());
-    localStorage.removeItem("jwtToken");
-    navigate("/");
-  };
+  dispatch(logout()); // clears auth slice
+  localStorage.removeItem("jwtToken"); // remove token
+  sessionStorage.clear(); // clear any session cache if used
+  navigate("/", { replace: true }); // redirect to landing page
+  window.location.reload(); // ensure full refresh (optional but ensures clean state)
+};
+
 
   return (
     <>
