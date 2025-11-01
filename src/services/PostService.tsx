@@ -4,21 +4,6 @@ import { Post } from '../store/slices/blogSlice';
 export const API_URL = "http://localhost:8080/api/posts"; // backend posts API
 export const BASE_URL = "http://localhost:8080";
 
-// export const fetchUserPosts = async (email: string): Promise<Post[]> => {
-//   const token = localStorage.getItem('token');
-  
-//   if (!token) {
-//     throw new Error('No authentication token found');
-//   }
-
-//   const response = await axios.get(`${API_URL}/user/${email}`, {
-//     headers: {
-//       Authorization: `Bearer ${token}`,
-//     },
-//   });
-
-//   return response.data;
-// };
 
 export const fetchAllPosts = async (): Promise<Post[]> => {
   try {
