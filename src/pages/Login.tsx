@@ -109,7 +109,7 @@ const lastname = rest.join(' ');
   console.log('Redux state updated');
 
   // ✅ Redirect to home page
-  navigate('/', { replace: true });
+  navigate('/home', { replace: true });
 }
 else {
         throw new Error('No data received from server');

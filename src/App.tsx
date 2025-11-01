@@ -1,9 +1,8 @@
+import React, { useState, useMemo } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { Provider } from 'react-redux';
-import { ThemeProvider, CssBaseline, Box } from '@mui/material';
+import { Provider, useSelector } from 'react-redux';
+import { ThemeProvider, CssBaseline, Box, createTheme } from '@mui/material';
 import { store } from './store/store';
-import theme from './theme';
-
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import PrivateRoute from './components/PrivateRoute';
@@ -16,26 +15,61 @@ import CreatePost from './pages/CreatePost';
 import PostDetail from './pages/PostDetail';
 import Profile from './pages/Profile';
 import MyPosts from './pages/MyPosts';
-import LandingPage from 'pages/LandingPage';
+import LandingPage from './pages/LandingPage';
 
 function App() {
+  // 🌙 Dark Mode Toggle
+  const [darkMode, setDarkMode] = useState(false);
+
+  // 🎨 Dynamically create MUI theme
+  const appliedTheme = useMemo(
+    () =>
+      createTheme({
+        palette: {
+          mode: darkMode ? 'dark' : 'light',
+          primary: {
+            main: darkMode ? '#90caf9' : '#1976d2',
+          },
+          background: {
+            default: darkMode ? '#121212' : '#f5f5f5',
+            paper: darkMode ? '#1e1e1e' : '#fff',
+          },
+        },
+      }),
+    [darkMode]
+  );
+
+  const toggleTheme = () => setDarkMode(!darkMode);
+
   return (
     <Provider store={store}>
-      <ThemeProvider theme={theme}>
+      <ThemeProvider theme={appliedTheme}>
         <CssBaseline />
         <Router>
-          <Box sx={{ 
-            display: 'flex', 
-            flexDirection: 'column',
-            minHeight: '100vh'
-          }}>
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              minHeight: '100vh',
+            }}
+          >
             <AuthInitializer />
-            <Navbar />
+            {/* ✅ Pass theme toggle to Navbar */}
+            <Navbar toggleTheme={toggleTheme} darkMode={darkMode} />
+
             <Box sx={{ flex: 1 }}>
               <Routes>
-                <Route path="/home" element={<Home />} />
+                {/* Default route → Landing Page */}
+                <Route path="/" element={<LandingPage />} />
+
+                {/* Auth pages */}
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
+
+                {/* Home */}
+                <Route path="/home" element={<Home />} />
+
+                {/* Private Routes */}
                 <Route
                   path="/create-post"
                   element={
@@ -61,9 +95,12 @@ function App() {
                     </PrivateRoute>
                   }
                 />
-                <Route path="/" element={<LandingPage />} />
+
+                {/* Fallback → 404 or redirect */}
+                <Route path="*" element={<Navigate to="/" />} />
               </Routes>
             </Box>
+
             <Footer />
           </Box>
         </Router>
@@ -71,5 +108,6 @@ function App() {
     </Provider>
   );
 }
+
 
 export default App;
