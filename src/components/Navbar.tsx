@@ -1,173 +1,6 @@
-
-
-
-// import React, { useState } from 'react';
-// import { Link as RouterLink } from 'react-router-dom';
-// import { useSelector } from 'react-redux';
-// import {
-//   AppBar,
-//   Toolbar,
-//   Typography,
-//   Button,
-//   Box,
-//   Badge,
-//   Dialog,
-//   DialogTitle,
-//   DialogContent,
-//   List,
-//   ListItem,
-//   ListItemText,
-//   IconButton,
-//   Divider,
-// } from '@mui/material';
-// import NotificationsIcon from '@mui/icons-material/Notifications';
-// import { RootState } from '../store/store';
-
-// type NotificationItem = {
-//   id: string;
-//   title: string;
-//   body?: string;
-//   date?: string; // ISO string preferred
-//   read?: boolean;
-// };
-
-// /**
-//  * NotificationMenu
-//  *
-//  * Props:
-//  * - notifications: NotificationItem[] (optional) - list of notifications to display.
-//  *
-//  * Behavior:
-//  * - Shows a bell icon with unread badge.
-//  * - Opens a Dialog with a scrollable list of notifications on click.
-//  * - This is intentionally simple so you can wire it to Redux / API easily.
-//  */
-// const NotificationMenu: React.FC<{ notifications?: NotificationItem[] }> = ({ notifications = [] }) => {
-//   const [open, setOpen] = useState(false);
-
-//   const unreadCount = notifications.filter(n => !n.read).length;
-
-//   return (
-//     <>
-//       <IconButton
-//         color="inherit"
-//         onClick={() => setOpen(true)}
-//         size="large"
-//         aria-label={`show ${unreadCount} new notifications`}
-//       >
-//         <Badge badgeContent={unreadCount} color="error">
-//           <NotificationsIcon />
-//         </Badge>
-//       </IconButton>
-
-//       <Dialog open={open} onClose={() => setOpen(false)} fullWidth maxWidth="sm">
-//         <DialogTitle>Notifications</DialogTitle>
-//         <DialogContent dividers>
-//           {notifications.length === 0 ? (
-//             <Box sx={{ py: 3, textAlign: 'center' }}>
-//               <Typography variant="body2" color="text.secondary">
-//                 No notifications
-//               </Typography>
-//             </Box>
-//           ) : (
-//             <List>
-//               {notifications.map(n => (
-//                 <React.Fragment key={n.id}>
-//                   <ListItem alignItems="flex-start" sx={{ py: 1.5 }}>
-//                     <ListItemText
-//                       primary={
-//                         <Typography variant="subtitle2" noWrap>
-//                           {n.title}
-//                         </Typography>
-//                       }
-//                       secondary={
-//                         <>
-//                           {n.body && (
-//                             <Typography variant="body2" color="text.secondary" sx={{ display: 'block' }}>
-//                               {n.body}
-//                             </Typography>
-//                           )}
-//                           {n.date && (
-//                             <Typography variant="caption" color="text.secondary">
-//                               {new Date(n.date).toLocaleString()}
-//                             </Typography>
-//                           )}
-//                         </>
-//                       }
-//                     />
-//                   </ListItem>
-//                   <Divider component="li" />
-//                 </React.Fragment>
-//               ))}
-//             </List>
-//           )}
-//         </DialogContent>
-//       </Dialog>
-//     </>
-//   );
-// };
-
-// const Navbar: React.FC = () => {
-//   const { isAuthenticated } = useSelector((state: RootState) => state.auth);
-//   // adjust to the actual path in your blog slice; use a safe fallback
-//   const notifications = useSelector((state: RootState) => (state.blog as any)?.notifications ?? []);
-
-//   return (
-//     <AppBar position="static">
-//       <Toolbar>
-//         <Typography variant="h6" component={RouterLink} to="/home" sx={{ flexGrow: 1, textDecoration: 'none', color: 'inherit' }}>
-//           Chatbook App
-//         </Typography>
-//         <Box sx={{ display: 'flex', alignItems: 'center' }}>
-//           <NotificationMenu notifications={notifications} />
-//           {isAuthenticated ? (
-//             <>
-//               <Button color="inherit" component={RouterLink} to="/create-post">
-//                 Create Post
-//               </Button>
-//               <Button color="inherit" component={RouterLink} to="/profile">
-//                 Profile
-//               </Button>
-//             </>
-//           ) : (
-//             <>
-//               <Button color="inherit" component={RouterLink} to="/login">
-//                 Login
-//               </Button>
-//               <Button color="inherit" component={RouterLink} to="/register">
-//                 Register
-//               </Button>
-//             </>
-//           )}
-//         </Box>
-//       </Toolbar>
-//     </AppBar>
-//   );
-// };
-
-// export default Navbar;
-
-// /*
-//   How to use / wire up:
-
-//   1) If you keep local dummy notifications for now, insert:
-//      <NotificationMenu notifications={[
-//        { id: '1', title: 'Welcome to Chatbook!', body: 'Thanks for joining', date: new Date().toISOString(), read: false }
-//      ]} />
-
-//   2) To wire to Redux (recommended), import `useSelector` and `RootState` and replace the prop with:
-//      const notifications = useSelector((state: RootState) => state.notifications?.items ?? []);
-//      <NotificationMenu notifications={notifications} />
-
-//   3) Place the component beside your other header IconButtons (e.g. next to profile / auth icons).
-// */
-// {/* <MyComponent title={''} /> */}
-
-
-
-import React, { useState } from 'react';
-import { Link as RouterLink, useNavigate } from 'react-router-dom';
-import { useSelector, useDispatch } from 'react-redux';
+import React, { useState } from "react";
+import { Link as RouterLink, useNavigate } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
 import {
   AppBar,
   Toolbar,
@@ -183,17 +16,16 @@ import {
   ListItemText,
   IconButton,
   Divider,
-  Switch,
   Tooltip,
-} from '@mui/material';
-import NotificationsIcon from '@mui/icons-material/Notifications';
-import Brightness4Icon from '@mui/icons-material/Brightness4';
-import Brightness7Icon from '@mui/icons-material/Brightness7';
-import LogoutIcon from '@mui/icons-material/Logout';
-import { RootState } from '../store/store';
-import { logout } from '../store/slices/authSlice'; // ✅ Adjust import based on your slice
+  useTheme,
+} from "@mui/material";
+import NotificationsIcon from "@mui/icons-material/Notifications";
+import Brightness4Icon from "@mui/icons-material/Brightness4";
+import Brightness7Icon from "@mui/icons-material/Brightness7";
+import LogoutIcon from "@mui/icons-material/Logout";
+import { RootState } from "../store/store";
+import { logout } from "../store/slices/authSlice";
 
-// ---------------- Notification Menu ---------------- //
 type NotificationItem = {
   id: string;
   title: string;
@@ -202,9 +34,12 @@ type NotificationItem = {
   read?: boolean;
 };
 
-const NotificationMenu: React.FC<{ notifications?: NotificationItem[] }> = ({ notifications = [] }) => {
+const NotificationMenu: React.FC<{ notifications?: NotificationItem[] }> = ({
+  notifications = [],
+}) => {
   const [open, setOpen] = useState(false);
-  const unreadCount = notifications.filter(n => !n.read).length;
+  const unreadCount = notifications.filter((n) => !n.read).length;
+  const theme = useTheme();
 
   return (
     <>
@@ -219,18 +54,30 @@ const NotificationMenu: React.FC<{ notifications?: NotificationItem[] }> = ({ no
         </Badge>
       </IconButton>
 
-      <Dialog open={open} onClose={() => setOpen(false)} fullWidth maxWidth="sm">
+      <Dialog
+        open={open}
+        onClose={() => setOpen(false)}
+        fullWidth
+        maxWidth="sm"
+        PaperProps={{
+          sx: {
+            bgcolor: theme.palette.mode === "dark" ? "#1e1e1e" : "#fff",
+            color: theme.palette.text.primary,
+            borderRadius: 2,
+          },
+        }}
+      >
         <DialogTitle>Notifications</DialogTitle>
         <DialogContent dividers>
           {notifications.length === 0 ? (
-            <Box sx={{ py: 3, textAlign: 'center' }}>
+            <Box sx={{ py: 3, textAlign: "center" }}>
               <Typography variant="body2" color="text.secondary">
                 No notifications
               </Typography>
             </Box>
           ) : (
             <List>
-              {notifications.map(n => (
+              {notifications.map((n) => (
                 <React.Fragment key={n.id}>
                   <ListItem alignItems="flex-start" sx={{ py: 1.5 }}>
                     <ListItemText
@@ -242,7 +89,11 @@ const NotificationMenu: React.FC<{ notifications?: NotificationItem[] }> = ({ no
                       secondary={
                         <>
                           {n.body && (
-                            <Typography variant="body2" color="text.secondary" sx={{ display: 'block' }}>
+                            <Typography
+                              variant="body2"
+                              color="text.secondary"
+                              sx={{ display: "block" }}
+                            >
                               {n.body}
                             </Typography>
                           )}
@@ -266,78 +117,137 @@ const NotificationMenu: React.FC<{ notifications?: NotificationItem[] }> = ({ no
   );
 };
 
-// ---------------- Navbar ---------------- //
-const Navbar: React.FC<{ toggleTheme?: () => void; darkMode?: boolean }> = ({ toggleTheme, darkMode }) => {
+const Navbar: React.FC<{ toggleTheme?: () => void; darkMode?: boolean }> = ({
+  toggleTheme,
+  darkMode,
+}) => {
   const { isAuthenticated } = useSelector((state: RootState) => state.auth);
-  const notifications = useSelector((state: RootState) => (state.blog as any)?.notifications ?? []);
+  const notifications =
+    useSelector(
+      (state: RootState) => (state.blog as any)?.notifications ?? []
+    ) || [];
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const handleLogout = () => {
     dispatch(logout());
-    navigate('/');
+    localStorage.removeItem("jwtToken");
+    navigate("/");
   };
 
   return (
-    <AppBar position="static">
-      <Toolbar>
-        <Typography
-          variant="h6"
-          component={RouterLink}
-          to="/home"
-          sx={{
-            flexGrow: 1,
-            textDecoration: 'none',
-            color: 'inherit',
-            fontWeight: 600,
-          }}
-        >
-          Chatbook App
-        </Typography>
+    <>
+      {/* ✅ Fixed AppBar with consistent height */}
+      <AppBar
+        position="fixed"
+        color="primary"
+        sx={{
+          transition: "background-color 0.3s ease, color 0.3s ease",
+          boxShadow: 2,
+        }}
+      >
+        <Toolbar>
+          <Typography
+            variant="h6"
+            component={RouterLink}
+            to="/home"
+            sx={{
+              flexGrow: 1,
+              textDecoration: "none",
+              color: "inherit",
+              fontWeight: 600,
+            }}
+          >
+            Chatbook App
+          </Typography>
 
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          {/* 🔔 Notifications */}
-          <NotificationMenu notifications={notifications} />
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            <NotificationMenu
+              notifications={
+                notifications.length > 0
+                  ? notifications
+                  : [
+                      {
+                        id: "1",
+                        title: "Welcome to Chatbook!",
+                        body: "Start your first conversation today.",
+                        date: new Date().toISOString(),
+                        read: false,
+                      },
+                    ]
+              }
+            />
 
-          {/* 🌙 Theme Toggle */}
-          {toggleTheme && (
-            <Tooltip title={darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}>
-              <IconButton color="inherit" onClick={toggleTheme}>
-                {darkMode ? <Brightness7Icon /> : <Brightness4Icon />}
-              </IconButton>
-            </Tooltip>
-          )}
-
-          {/* 👤 Auth Buttons */}
-          {isAuthenticated ? (
-            <>
-              <Button color="inherit" component={RouterLink} to="/create-post">
-                Create Post
-              </Button>
-              <Button color="inherit" component={RouterLink} to="/profile">
-                Profile
-              </Button>
-
-              {/* 🚪 Logout */}
-              <Tooltip title="Logout">
-                <IconButton color="inherit" onClick={handleLogout}>
-                  <LogoutIcon />
+            {/* 🌙 Theme Toggle */}
+            {toggleTheme && (
+              <Tooltip
+                title={
+                  darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"
+                }
+              >
+                <IconButton
+                  color="inherit"
+                  onClick={toggleTheme}
+                  sx={{ transition: "transform 0.3s ease" }}
+                >
+                  {darkMode ? <Brightness7Icon /> : <Brightness4Icon />}
                 </IconButton>
               </Tooltip>
-            </>
-          ) : (
-            <>
-              <Button color="inherit" component={RouterLink} to="/login">
-                Login
-              </Button>
-              <Button color="inherit" component={RouterLink} to="/register">
-                Register
-              </Button>
-            </>
-          )}
-        </Box>
-      </Toolbar>
-    </AppBar>
+            )}
+
+            {/* 👤 Auth Buttons */}
+            {isAuthenticated ? (
+              <>
+                <Button
+                  color="inherit"
+                  component={RouterLink}
+                  to="/create-post"
+                  sx={{ fontWeight: 500 }}
+                >
+                  Create Post
+                </Button>
+                <Button
+                  color="inherit"
+                  component={RouterLink}
+                  to="/profile"
+                  sx={{ fontWeight: 500 }}
+                >
+                  Profile
+                </Button>
+                <Tooltip title="Logout">
+                  <IconButton color="inherit" onClick={handleLogout}>
+                    <LogoutIcon />
+                  </IconButton>
+                </Tooltip>
+              </>
+            ) : (
+              <>
+                <Button
+                  color="inherit"
+                  component={RouterLink}
+                  to="/login"
+                  sx={{ fontWeight: 500 }}
+                >
+                  Login
+                </Button>
+                <Button
+                  color="inherit"
+                  component={RouterLink}
+                  to="/register"
+                  sx={{ fontWeight: 500 }}
+                >
+                  Register
+                </Button>
+              </>
+            )}
+          </Box>
+        </Toolbar>
+      </AppBar>
+
+      {/* ✅ Add toolbar spacer so content isn't hidden under AppBar */}
+      <Toolbar />
+    </>
   );
 };
 
