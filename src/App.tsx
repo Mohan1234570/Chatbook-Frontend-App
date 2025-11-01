@@ -16,6 +16,7 @@ import CreatePost from './pages/CreatePost';
 import PostDetail from './pages/PostDetail';
 import Profile from './pages/Profile';
 import MyPosts from './pages/MyPosts';
+import LandingPage from 'pages/LandingPage';
 
 function App() {
   return (
@@ -32,7 +33,7 @@ function App() {
             <Navbar />
             <Box sx={{ flex: 1 }}>
               <Routes>
-                <Route path="/" element={<Home />} />
+                <Route path="/home" element={<Home />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
                 <Route
@@ -60,7 +61,7 @@ function App() {
                     </PrivateRoute>
                   }
                 />
-                <Route path="*" element={<Navigate to="/" replace />} />
+                <Route path="/" element={<LandingPage />} />
               </Routes>
             </Box>
             <Footer />
