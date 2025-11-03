@@ -1,4 +1,3 @@
-// Define comment structure
 export interface Comment {
   id: string;
   content: string;
