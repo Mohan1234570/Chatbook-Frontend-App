@@ -28,11 +28,7 @@ export interface AdminUser {
 }
 
 
-// Define possible structure for createdAt object
-// export interface CreatedAtObject {
-//   id: string;
-//   dateCreated: string;
-// }
+
 export interface CreatedAtObject {
   dateCreated: string;
 }
