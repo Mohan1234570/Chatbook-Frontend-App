@@ -18,8 +18,7 @@ import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
 import SecurityIcon from "@mui/icons-material/Security";
 import SpeedIcon from "@mui/icons-material/Speed";
 import FormatQuoteIcon from "@mui/icons-material/FormatQuote";
-import Brightness4Icon from "@mui/icons-material/Brightness4";
-import Brightness7Icon from "@mui/icons-material/Brightness7";
+
 
 const MotionBox = motion(Box);
 const MotionTypography = motion(Typography);
