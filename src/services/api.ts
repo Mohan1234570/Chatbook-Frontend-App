@@ -10,7 +10,7 @@ const api = axios.create({
     'Content-Type': 'application/json',
     'Accept': 'application/json'
   },
-  withCredentials: false
+  withCredentials: true
 });
 
 // ✅ Backend health test
@@ -44,17 +44,43 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// ✅ Handle 401 responses
+
+// =========================
+// Handle 401 → Auto Refresh
+// =========================
+let isRefreshing = false;
+let failedQueue: any[] = [];
+
+const processQueue = (error: any, token: string | null = null) => {
+  failedQueue.forEach((prom) => {
+    if (token) prom.resolve(token);
+    else prom.reject(error);
+  });
+  failedQueue = [];
+};
 api.interceptors.response.use(
   (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      localStorage.removeItem('token');
-      window.location.href = '/login';
+  async (error) => {
+    const originalRequest = error.config;
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+      try {
+        const refreshRes = await axios.post(`${API_URL}/users/refresh`, {}, { withCredentials: true });
+        const newToken = refreshRes.data.data;
+        localStorage.setItem('token', newToken);
+        originalRequest.headers['Authorization'] = `Bearer ${newToken}`;
+        return axios(originalRequest);
+      } catch (refreshErr) {
+        localStorage.removeItem('token');
+        window.location.href = '/login';
+        return Promise.reject(refreshErr);
+      }
     }
     return Promise.reject(error);
   }
 );
+
+
 
 // ✅ Auth APIs
 export const authAPI = {

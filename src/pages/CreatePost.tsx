@@ -371,7 +371,7 @@ const CreatePost: React.FC = () => {
         setImagePreview(null);
 
         setTimeout(() => {
-          navigate('/posts');
+          navigate('/home');
         }, 1500);
       } else {
         setError('Failed to create post');
