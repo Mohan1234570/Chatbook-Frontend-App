@@ -13,7 +13,7 @@ const api = axios.create({
   withCredentials: true
 });
 
-// ✅ Backend health test
+// Backend health test
 export const testBackendConnection = async () => {
   try {
     console.log('Testing backend connection...');
