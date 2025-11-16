@@ -128,7 +128,6 @@ const Profile: React.FC = () => {
 
   if (!user) return null;
 
-  // NEW: delete handler
   const handleDeletePost = async (postId: string) => {
     const confirmed = window.confirm('Are you sure you want to delete this post? This action cannot be undone.');
     if (!confirmed) return;
