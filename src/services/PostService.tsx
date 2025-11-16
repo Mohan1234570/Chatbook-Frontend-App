@@ -15,7 +15,6 @@ export const fetchAllPosts = async (): Promise<Post[]> => {
 
     const posts: any[] = response.data.data || [];
 
-    // Normalize posts for frontend
     return posts.map(post => ({
       ...post,
       createdAt: post.dateCreated ?? post.createdAt,
