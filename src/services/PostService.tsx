@@ -21,7 +21,7 @@ export const fetchAllPosts = async (): Promise<Post[]> => {
       comments: post.comments ?? [],
       likes: post.likesCount ?? post.likes ?? 0,
       shares: post.shares ?? 0,
-      imageUrl: post.imageUrl ? `${BASE_URL}${post.imageUrl}` : null, // full URL
+      imageUrl: post.imageUrl ? `${BASE_URL}${post.imageUrl}` : null, 
     }));
   } catch (error) {
     console.error('Error fetching posts:', error);
