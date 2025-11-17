@@ -44,7 +44,7 @@ export const fetchUserPosts = async (): Promise<Post[]> => {
       createdAt: post.dateCreated,
       likes: post.likesCount ?? 0,
       comments: post.comments ?? [],
-      // 👇 Prepend BASE_URL to imageUrl if available
+      // Prepend BASE_URL to imageUrl if available
       imageUrl: post.imageUrl ? `${API_URL}${post.imageUrl}` : null,
     }));
   } catch (error) {
