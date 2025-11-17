@@ -19,7 +19,7 @@ import {
   Comment as CommentIcon
 } from '@mui/icons-material';
 
-// ✅ Use shared types from Redux slice instead of local interfaces
+// Use shared types from Redux slice instead of local interfaces
 import type { Post, Comment } from '../store/slices/blogSlice';
 
 const Home: React.FC = () => {
@@ -54,7 +54,7 @@ const Home: React.FC = () => {
     loadAllPosts();
   }, [dispatch]);
 
-  // ✅ Like / Dislike / Share
+  // Like / Dislike / Share
   const handleLike = async (postId: string) => {
     if (!isAuthenticated) return navigate('/login');
     try {
@@ -85,7 +85,7 @@ const Home: React.FC = () => {
     }
   };
 
-  // ✅ Comment handling
+  // Comment handling
   const handleOpenComment = (postId: string) => {
     if (!isAuthenticated) return navigate('/login');
     setOpenCommentId(postId);
@@ -113,7 +113,7 @@ const Home: React.FC = () => {
         createdAt: c.createdAt,
       }));
 
-      // ✅ Dispatch with consistent slice type
+      // Dispatch with consistent slice type
       dispatch(addComment({ postId, allComments: normalizedComments }));
 
       // Refresh post
@@ -131,7 +131,7 @@ const Home: React.FC = () => {
 
   return (
     <Container sx={{ mt: 4 }}>
-      {/* ✅ Posts Grid */}
+      {/* Posts Grid */}
       <Box
         component="section"
         sx={{
@@ -214,7 +214,7 @@ const Home: React.FC = () => {
         ))}
       </Box>
 
-      {/* ✅ Post Dialog */}
+      {/* Post Dialog */}
       <Dialog open={!!selectedPost} onClose={handleClosePost} maxWidth="md" fullWidth>
         {selectedPost && (
           <>
@@ -253,7 +253,7 @@ const Home: React.FC = () => {
         )}
       </Dialog>
 
-      {/* ✅ Comment Dialog */}
+      {/* Comment Dialog */}
       <Dialog open={Boolean(openCommentId)} onClose={handleCloseComment} maxWidth="sm" fullWidth>
         {commentPost && (
           <>
