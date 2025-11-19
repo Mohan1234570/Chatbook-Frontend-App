@@ -44,7 +44,6 @@ const Profile: React.FC = () => {
   const [userPosts, setUserPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // NEW: id of the post currently being deleted (to disable its button)
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [openImage, setOpenImage] = useState<string | null>(null);
 
