@@ -6,7 +6,7 @@ export interface Comment {
   username: string;
   createdAt: string;
   userId?: number;
-  _id?: string; // <-- allow optional Mongo-style id sent by backend
+  _id?: string; 
 }
 
 export interface Post {
