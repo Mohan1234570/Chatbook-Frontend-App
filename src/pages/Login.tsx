@@ -72,9 +72,12 @@ const Login: React.FC = () => {
       console.log('Login data being sent:', { email: formData.email });
       const response = await authAPI.login(formData);
       console.log('Login response:', response);
+      console.log("RAW login response:", JSON.stringify(response.data, null, 2));
 
       if (response.data) {
-  const { token, user } = response.data;
+  const token = response.data.token.token;   // actual JWT
+  const user = response.data.token.user;        // actual user
+
   console.log('Extracted token and user:', { token, user });
 
   if (!token) {
@@ -84,6 +87,7 @@ const Login: React.FC = () => {
   // ✅ Store token and user in localStorage
   localStorage.setItem('token', token);
   localStorage.setItem('user', JSON.stringify(user));
+  localStorage.setItem('user_id', String(user.id));
   console.log('Token and user stored in localStorage');
 
   /// Safely split full name from backend if it only returns 'name'
@@ -92,18 +96,10 @@ const [firstname, ...rest] = fullName.split(' ');
 const lastname = rest.join(' ');
 
   dispatch(
-    loginSuccess({
-      token: token,
-      user: {
-        id: user.id || '',
-        firstname,
-        lastname,
-        email: user.email || formData.email,
-        role: user.role === 'admin' ? 'admin' : 'user',
-        profileImageUrl: (user as any).profileImageUrl || '',
-        bio: (user as any).bio || '',
-      },
-    })
+  loginSuccess({
+    token: token,
+    user,
+  })
   );
 
   console.log('Redux state updated');
