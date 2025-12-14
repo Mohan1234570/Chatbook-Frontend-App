@@ -18,6 +18,7 @@ import PostDetail from './pages/PostDetail';
 import Profile from './pages/Profile';
 import MyPosts from './pages/MyPosts';
 import LandingPage from './pages/LandingPage';
+import UserProfile from 'pages/UserProfile';
 
 function App() {
   // 🌙 Load dark mode preference from localStorage (persistent)
@@ -121,6 +122,8 @@ function App() {
                     </PrivateRoute>
                   }
                 />
+                <Route path="/users/:userId" element={<UserProfile />} />
+                <Route path="/profile/:id" element={<Profile />} />
                 <Route
                   path="/myposts"
                   element={
