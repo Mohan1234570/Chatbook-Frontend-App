@@ -52,3 +52,21 @@ export interface ApiResponse<T> {
   message: string;
   data: T;
 }
+
+
+// export interface Post {
+//   id: number;
+//   content: string;
+//   imageUrl?: string | null;
+//   createdAt: string;
+//}
+
+export interface UserProfile {
+  userId: number;
+  firstname: string | null;
+  lastname: string | null;
+  emailid: string;
+  followersCount: number;
+  followingCount: number;
+  posts: Post[];
+}
