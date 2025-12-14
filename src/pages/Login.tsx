@@ -84,11 +84,12 @@ const Login: React.FC = () => {
     throw new Error('No token received from server');
   }
 
-  // ✅ Store token and user in localStorage
-  localStorage.setItem('token', token);
-  localStorage.setItem('user', JSON.stringify(user));
-  localStorage.setItem('user_id', String(user.id));
-  console.log('Token and user stored in localStorage');
+const userId = response.data.token.user.id;
+localStorage.setItem('token', token);
+localStorage.setItem("userId", String(userId));  // ✅ "8"
+localStorage.setItem('email', user.email);
+
+console.log('Stored user id:', user.id);
 
   /// Safely split full name from backend if it only returns 'name'
 const fullName = (user as any).name || '';
