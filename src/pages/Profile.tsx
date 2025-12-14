@@ -410,7 +410,6 @@
 // export default Profile;
 
 
-
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
@@ -423,19 +422,19 @@ import {
   CardActions,
   Button,
   Avatar,
-  Divider,
+  Divider
 } from '@mui/material';
 import axios from 'axios';
-
-const BASE_URL = 'http://localhost:8080';
 
 interface Post {
   id: string;
   title: string;
   content: string;
   imageUrl?: string;
-  dateCreated: string;
-  likesCount: number;
+  createdAt: string;
+  likes: number;
+  commentsCount: number;
+  sharesCount: number;
 }
 
 interface UserProfile {
@@ -454,7 +453,7 @@ const Profile: React.FC = () => {
   const token = localStorage.getItem('token');
   const loggedInUserId = Number(localStorage.getItem('user_id'));
 
-  // if id not passed → own profile
+  // if id missing → open logged-in user profile
   const profileUserId = id ? Number(id) : loggedInUserId;
   const isOwnProfile = profileUserId === loggedInUserId;
 
@@ -473,16 +472,16 @@ const Profile: React.FC = () => {
       try {
         setLoading(true);
 
-        // 🔹 USER PROFILE
+        // 🔹 PROFILE
         const profileRes = await axios.get(
-          `${BASE_URL}/api/users/${profileUserId}`,
+          `http://localhost:8080/api/users/${profileUserId}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         setUserProfile(profileRes.data);
 
-        // 🔹 USER POSTS
+        // 🔹 POSTS
         const postsRes = await axios.get(
-          `${BASE_URL}/api/posts/userPosts/${profileUserId}`,
+          `http://localhost:8080/api/posts/userPosts/${profileUserId}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
 
@@ -493,21 +492,23 @@ const Profile: React.FC = () => {
             id: String(p.id),
             title: p.title,
             content: p.content,
-            imageUrl: p.imageUrl ? `${BASE_URL}${p.imageUrl}` : undefined,
-            dateCreated: p.dateCreated,
-            likesCount: p.likesCount ?? 0,
+            imageUrl: p.imageUrl,
+            createdAt: p.dateCreated,
+            likes: p.likesCount ?? 0,
+            commentsCount: p.comments?.length ?? 0, // future ready
+            sharesCount: 0, // placeholder
           }))
         );
 
         // 🔹 FOLLOW STATUS
         if (!isOwnProfile) {
           const statusRes = await axios.get(
-            `${BASE_URL}/api/follow/status/${profileUserId}`,
+            `http://localhost:8080/api/follow/status/${profileUserId}`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,
-                'X-USER-ID': loggedInUserId,
-              },
+                'X-USER-ID': loggedInUserId
+              }
             }
           );
           setIsFollowing(statusRes.data.isFollowing);
@@ -531,11 +532,11 @@ const Profile: React.FC = () => {
       ? `/api/follow/unfollow/${profileUserId}`
       : `/api/follow/follow/${profileUserId}`;
 
-    await axios.post(`${BASE_URL}${url}`, {}, {
+    await axios.post(`http://localhost:8080${url}`, {}, {
       headers: {
         Authorization: `Bearer ${token}`,
-        'X-USER-ID': loggedInUserId,
-      },
+        'X-USER-ID': loggedInUserId
+      }
     });
 
     setIsFollowing(prev => !prev);
@@ -597,25 +598,33 @@ const Profile: React.FC = () => {
 
           {userPosts.map(post => (
             <Card key={post.id} sx={{ mt: 2 }}>
+
               {post.imageUrl && (
                 <img
-                  src={post.imageUrl}
-                  alt={post.title}
+                  src={`http://localhost:8080${post.imageUrl}`}
+                  alt="post"
                   style={{ width: '100%', maxHeight: 350, objectFit: 'cover' }}
                 />
               )}
 
               <CardContent>
                 <Typography variant="h6">{post.title}</Typography>
-                <Typography>{post.content}</Typography>
+                <Typography sx={{ mb: 1 }}>{post.content}</Typography>
+
+                <Typography variant="caption" color="text.secondary">
+                  {new Date(post.createdAt).toLocaleString()}
+                </Typography>
+
+                <Divider sx={{ my: 1 }} />
+
+                <Typography variant="body2">
+                  👍 {post.likes} · 💬 {post.commentsCount} · 🔁 {post.sharesCount}
+                </Typography>
               </CardContent>
 
               <CardActions>
-                <Typography sx={{ ml: 1 }}>
-                  ❤️ {post.likesCount}
-                </Typography>
                 <Button onClick={() => navigate(`/post/${post.id}`)}>
-                  Read
+                  View Post
                 </Button>
               </CardActions>
             </Card>
