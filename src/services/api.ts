@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { Post, Comment, ApiResponse } from '../types/index';
+import { Post, Comment, ApiResponse, UserProfile } from '../types/index';
 
 const API_URL = 'http://localhost:8080/api';
 
@@ -45,9 +45,6 @@ api.interceptors.request.use(
 );
 
 
-// =========================
-// Handle 401 → Auto Refresh
-// =========================
 let isRefreshing = false;
 let failedQueue: any[] = [];
 
@@ -267,6 +264,78 @@ getComments: async (postId: string) => {
       }))
     : [];
 }
+};
+
+
+// ==========================
+// USER PROFILE APIs
+// ==========================
+export const userAPI = {
+  getUserProfile: async (userId: number) => {
+    const res = await api.get<UserProfile>(`/users/${userId}`);
+    return res.data;
+  }
+};
+
+
+// ==========================
+// FOLLOW / UNFOLLOW APIs
+// ==========================
+
+export const followAPI = {
+  followUser: async (targetId: number) => {
+    const userEmail = localStorage.getItem("userEmail");
+    if (!userEmail) throw new Error("User not logged in");
+
+    // Backend expects X-USER-ID as Long userId → so assuming backend maps userEmail to userId
+    const userId = localStorage.getItem("userId"); 
+    if (!userId) throw new Error("User ID not found");
+
+    const res = await api.post(
+      `/follow/follow/${targetId}`,
+      {},
+      {
+        headers: {
+          "X-USER-ID": userId
+        }
+      }
+    );
+
+    return res.data;
+  },
+
+  unfollowUser: async (targetId: number) => {
+    const userId = localStorage.getItem("userId");
+    if (!userId) throw new Error("User ID not found");
+
+    const res = await api.post(
+      `/follow/unfollow/${targetId}`,
+      {},
+      {
+        headers: {
+          "X-USER-ID": userId
+        }
+      }
+    );
+
+    return res.data;
+  },
+
+  checkFollowStatus: async (targetId: number) => {
+    const userId = localStorage.getItem("userId");
+    if (!userId) throw new Error("User ID not found");
+
+    const res = await api.get(
+      `/follow/status/${targetId}`,
+      {
+        headers: {
+          "X-USER-ID": userId
+        }
+      }
+    );
+
+    return res.data.isFollowing;
+  }
 };
 
 export default api;
